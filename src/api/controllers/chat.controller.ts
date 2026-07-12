@@ -60,6 +60,10 @@ export class ChatController {
     return await this.waMonitor.waInstances[instanceName].getLid(data.number);
   }
 
+  public async fetchPhone({ instanceName }: InstanceDto, data: NumberDto) {
+    return await this.waMonitor.waInstances[instanceName].getPhoneForLid(data.number);
+  }
+
   public async fetchContacts({ instanceName }: InstanceDto, query: Query<Contact>) {
     return await this.waMonitor.waInstances[instanceName].fetchContacts(query);
   }

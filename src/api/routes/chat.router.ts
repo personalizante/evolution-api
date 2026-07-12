@@ -28,6 +28,7 @@ import {
   decryptPollVoteSchema,
   deleteMessageSchema,
   fetchLidSchema,
+  fetchPhoneSchema,
   markChatUnreadSchema,
   markMessageAsPlayedSchema,
   messageUpSchema,
@@ -243,6 +244,16 @@ export class ChatRouter extends RouterBroker {
           schema: fetchLidSchema,
           ClassRef: NumberDto,
           execute: (instance, data) => chatController.fetchLid(instance, data),
+        });
+
+        return res.status(HttpStatus.OK).json(response);
+      })
+      .post(this.routerPath('fetchPhone'), ...guards, async (req, res) => {
+        const response = await this.dataValidate<NumberDto>({
+          request: req,
+          schema: fetchPhoneSchema,
+          ClassRef: NumberDto,
+          execute: (instance, data) => chatController.fetchPhone(instance, data),
         });
 
         return res.status(HttpStatus.OK).json(response);

@@ -2286,6 +2286,26 @@ export class BaileysStartupService extends ChannelStartupService {
     }
   }
 
+  public async getPhoneForLid(lid: string) {
+    const jid = createJid(lid);
+
+    if (!jid.includes('@lid')) {
+      return { lid: jid, wuid: null };
+    }
+
+    if (!this.client?.signalRepository) {
+      return { lid: jid, wuid: null };
+    }
+
+    try {
+      const pn = await this.client.signalRepository.lidMapping.getPNForLID(jid);
+      return { lid: jid, wuid: pn || null };
+    } catch (error) {
+      this.logger.error(`Failed to fetch PN for LID ${jid}: ${error}`);
+      return { lid: jid, wuid: null };
+    }
+  }
+
   public async getStatus(number: string) {
     const jid = createJid(number);
 

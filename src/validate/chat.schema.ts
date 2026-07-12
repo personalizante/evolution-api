@@ -347,3 +347,13 @@ export const fetchLidSchema: JSONSchema7 = {
   },
   required: ['number'],
 };
+
+/** @lid (ou dígitos) → telefone PN via Baileys getPNForLID */
+export const fetchPhoneSchema: JSONSchema7 = {
+  $id: v4(),
+  type: 'object',
+  properties: {
+    number: { type: 'string' },
+  },
+  required: ['number'],
+};
