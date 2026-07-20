@@ -448,18 +448,28 @@ export class InstanceController {
       // connectionState (memória) pode estar "close" enquanto fetchInstances
       // ainda lê connectionStatus="open" no banco — o Manager fica preso em Connected
       // e o botão Disconnect parece morto. Sincroniza o banco neste early-return.
+      let syncedRows = 0;
       try {
-        await this.prismaRepository.instance.updateMany({
+        const updated = await this.prismaRepository.instance.updateMany({
           where: { name: instanceName },
           data: { connectionStatus: 'close' },
         });
+        syncedRows = updated?.count ?? 0;
       } catch (error) {
         this.logger.warn(
           `logout: failed to sync connectionStatus=close for "${instanceName}": ${(error as Error)?.message}`,
         );
       }
 
-      return { status: 'SUCCESS', error: false, response: { message: 'Instance was already disconnected' } };
+      return {
+        status: 'SUCCESS',
+        error: false,
+        response: {
+          message: 'Instance was already disconnected',
+          connectionStatusSynced: true,
+          syncedRows,
+        },
+      };
     }
 
     try {
