@@ -445,6 +445,20 @@ export class InstanceController {
     // Idempotente: se já está desconectada, retorna sucesso silenciosamente.
     // Evita falhar o fluxo de delete do painel, que sempre chama logout antes do delete.
     if (instance.state === 'close') {
+      // connectionState (memória) pode estar "close" enquanto fetchInstances
+      // ainda lê connectionStatus="open" no banco — o Manager fica preso em Connected
+      // e o botão Disconnect parece morto. Sincroniza o banco neste early-return.
+      try {
+        await this.prismaRepository.instance.updateMany({
+          where: { name: instanceName },
+          data: { connectionStatus: 'close' },
+        });
+      } catch (error) {
+        this.logger.warn(
+          `logout: failed to sync connectionStatus=close for "${instanceName}": ${(error as Error)?.message}`,
+        );
+      }
+
       return { status: 'SUCCESS', error: false, response: { message: 'Instance was already disconnected' } };
     }
 
